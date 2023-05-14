@@ -6,6 +6,7 @@ import {
   userSignup,
   updateUser,
   deleteUser,
+  followUser,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -17,5 +18,10 @@ router
   .route("/userId")
   .patch(authUser, restrictTo("User"), updateUser)
   .delete(authUser, restrictTo("User", "Admin"), deleteUser);
+
+router.route("/addFriend/:userId").patch(authUser, restrictTo("User"), addUser);
+router
+  .route("/deleteFriend/:userId")
+  .patch(authUser, restrictTo("User"), removeFriendUser);
 
 export default router;

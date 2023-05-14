@@ -96,7 +96,6 @@ export const updateUser = catchAsync(async (req, res, next) => {
     {
       $set: {
         name,
-        address,
       },
     },
     { new: true }
@@ -119,5 +118,59 @@ export const getAllUsers = catchAsync(async (req, res, next) => {
     status: "success",
     results: UserData.length,
     data: UserData,
+  });
+});
+
+export const getFriends = catchAsync(async (req, res, next) => {
+  const UserData = await User.find().select("friends").populate("friends");
+  if (!UserData) {
+    return new AppError(`No User found with this Id`, 401);
+  }
+  res.status(201).json({
+    status: "success",
+    results: UserData.length,
+    data: UserData,
+  });
+});
+
+export const addUser = catchAsync(async (req, res, next) => {
+  const friendId = req.params.userId;
+  const userId = req.user._id;
+  const userData = await User.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: {
+        friends: friendId,
+      },
+    },
+    { new: true }
+  );
+  if (!userData) {
+    return new AppError(`No User found with this Id`, 401);
+  }
+  res.status(201).json({
+    status: "success",
+    data: userData,
+  });
+});
+
+export const removeFriendUser = catchAsync(async (req, res, next) => {
+  const friendId = req.params.userId;
+  const userId = req.user._id;
+  const userData = await User.findByIdAndUpdate(
+    userId,
+    {
+      $pull: {
+        friends: friendId,
+      },
+    },
+    { new: true }
+  );
+  if (!userData) {
+    return new AppError(`No User found with this Id`, 401);
+  }
+  res.status(201).json({
+    status: "success",
+    data: userData,
   });
 });
